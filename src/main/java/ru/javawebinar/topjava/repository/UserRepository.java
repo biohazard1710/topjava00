@@ -14,8 +14,8 @@ public interface UserRepository {
     // null if not found
     User get(int id);
 
+    List<User> getAll();
+
     // null if not found
     User getByEmail(String email);
-
-    List<User> getAll();
 }
