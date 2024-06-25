@@ -84,7 +84,7 @@ public class MealServlet extends HttpServlet {
                 break;
             case CREATE:
             case UPDATE:
-                final Meal meal = "create".equals(action) ?
+                final Meal meal = Action.CREATE.equals(action) ?
                         new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000) :
                         mealRestController.get(getId(request));
                 request.setAttribute(MEAL, meal);
