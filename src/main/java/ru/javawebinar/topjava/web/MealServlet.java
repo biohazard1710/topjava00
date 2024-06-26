@@ -31,10 +31,10 @@ public class MealServlet extends HttpServlet {
     private static final String PARAMETER_DESCRIPTION = "description";
     private static final String PARAMETER_CALORIES = "calories";
     private static final String PARAMETER_ACTION = "action";
-    private static final String MEAL = "meal";
-    private static final String MEALS = "meals";
-    private static final String MEAL_FORM_JSP = "/mealForm.jsp";
-    private static final String MEALS_JSP = "/meals.jsp";
+    private static final String REQUEST_MEAL = "meal";
+    private static final String REQUEST_MEALS = "meals";
+    private static final String VIEW_MEAL_FORM_JSP = "/mealForm.jsp";
+    private static final String VIEW_MEALS_JSP = "/meals.jsp";
     private static final String PARAMETER_START_DATE = "startDate";
     private static final String PARAMETER_END_DATE = "endDate";
     private static final String PARAMETER_START_TIME = "startTime";
@@ -60,20 +60,16 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         request.setCharacterEncoding(CHARACTER_ENCODING);
-        String id = request.getParameter(PARAMETER_ID);
 
-        Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
-                LocalDateTime.parse(request.getParameter(PARAMETER_DATE_TIME)),
-                request.getParameter(PARAMETER_DESCRIPTION),
-                Integer.parseInt(request.getParameter(PARAMETER_CALORIES)));
-
+        Meal meal = createMealFromRequest(request);
+        
         log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
         if (meal.isNew()) {
             mealRestController.create(meal);
         } else {
             mealRestController.update(meal, meal.getId());
         }
-        response.sendRedirect(MEALS);
+        response.sendRedirect(VIEW_MEALS_JSP);
     }
 
     @Override
@@ -86,30 +82,30 @@ public class MealServlet extends HttpServlet {
                 int id = getId(request);
                 log.info("Delete id={}", id);
                 mealRestController.delete(id);
-                response.sendRedirect(MEALS);
+                response.sendRedirect(VIEW_MEALS_JSP);
                 break;
             case CREATE:
             case UPDATE:
                 final Meal meal = Action.CREATE.equals(action) ?
                         new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000) :
                         mealRestController.get(getId(request));
-                request.setAttribute(MEAL, meal);
-                request.getRequestDispatcher(MEAL_FORM_JSP).forward(request, response);
+                request.setAttribute(REQUEST_MEAL, meal);
+                request.getRequestDispatcher(VIEW_MEAL_FORM_JSP).forward(request, response);
                 break;
             case FILTER:
                 LocalDate startDate = parseLocalDate(request.getParameter(PARAMETER_START_DATE));
                 LocalDate endDate = parseLocalDate(request.getParameter(PARAMETER_END_DATE));
                 LocalTime startTime = parseLocalTime(request.getParameter(PARAMETER_START_TIME));
                 LocalTime endTime = parseLocalTime(request.getParameter(PARAMETER_END_TIME));
-                request.setAttribute(MEALS, mealRestController.getBetween(startDate, startTime, endDate, endTime));
-                request.getRequestDispatcher(MEALS_JSP).forward(request, response);
+                request.setAttribute(REQUEST_MEALS, mealRestController.getBetween(startDate, startTime, endDate, endTime));
+                request.getRequestDispatcher(VIEW_MEALS_JSP).forward(request, response);
                 break;
             case ALL:
             default:
                 log.info("getAll");
                 List<MealTo> meals = mealRestController.getAll();
-                request.setAttribute(MEALS, meals);
-                request.getRequestDispatcher(MEALS_JSP).forward(request, response);
+                request.setAttribute(REQUEST_MEALS, meals);
+                request.getRequestDispatcher(VIEW_MEALS_JSP).forward(request, response);
                 break;
         }
     }
@@ -117,5 +113,13 @@ public class MealServlet extends HttpServlet {
     private int getId(HttpServletRequest request) {
         String paramId = Objects.requireNonNull(request.getParameter(PARAMETER_ID));
         return Integer.parseInt(paramId);
+    }
+
+    private Meal createMealFromRequest(HttpServletRequest request) {
+        String id = request.getParameter(PARAMETER_ID);
+        return new Meal(id.isEmpty() ? null : Integer.valueOf(id),
+                LocalDateTime.parse(request.getParameter(PARAMETER_DATE_TIME)),
+                request.getParameter(PARAMETER_DESCRIPTION),
+                Integer.parseInt(request.getParameter(PARAMETER_CALORIES)));
     }
 }

@@ -10,6 +10,8 @@ import java.util.List;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 import static ru.javawebinar.topjava.util.DateTimeUtil.getStartInclusive;
 import static ru.javawebinar.topjava.util.DateTimeUtil.getEndExclusive;
+import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
+import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 
 @Service
 public class MealService {
@@ -21,10 +23,12 @@ public class MealService {
     }
 
     public Meal create(Meal meal, int userId) {
+        checkNew(meal);
         return repository.save(meal, userId);
     }
 
-    public void update(Meal meal, int userId) {
+    public void update(Meal meal, int id, int userId) {
+        assureIdConsistent(meal, id);
         checkNotFoundWithId(repository.save(meal, userId), meal.getId());
     }
 

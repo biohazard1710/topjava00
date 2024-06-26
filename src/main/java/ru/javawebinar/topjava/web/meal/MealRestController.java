@@ -13,14 +13,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
-import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
-
 @Controller
 public class MealRestController {
     protected final Logger log = LoggerFactory.getLogger(MealRestController.class);
 
-    private MealService service;
+    private final MealService service;
 
     public MealRestController(MealService service) {
         this.service = service;
@@ -28,16 +25,14 @@ public class MealRestController {
 
     public Meal create(Meal meal) {
         int userId = SecurityUtil.authUserId();
-        checkNew(meal);
         log.info("create meal {} for user {}", meal, userId);
         return service.create(meal, userId);
     }
 
     public void update(Meal meal, int id) {
         int userId = SecurityUtil.authUserId();
-        assureIdConsistent(meal, id);
         log.info("update meal {} for user {}", meal, userId);
-        service.update(meal, userId);
+        service.update(meal, id, userId);
     }
 
     public void delete(int id) {
@@ -55,7 +50,8 @@ public class MealRestController {
     public List<MealTo> getAll() {
         int userId = SecurityUtil.authUserId();
         log.info("get meals for user {}", userId);
-        return MealsUtil.getTos(service.getAll(userId), SecurityUtil.authUserCaloriesPerDay());
+        List<Meal> meals = service.getAll(userId);
+        return MealsUtil.getTos(meals, SecurityUtil.authUserCaloriesPerDay());
     }
 
     public List<MealTo> getBetween(LocalDate startDate, LocalTime startTime, LocalDate endDate, LocalTime endTime) {
