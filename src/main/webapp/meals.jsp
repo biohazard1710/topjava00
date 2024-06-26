@@ -39,6 +39,7 @@
             <dt>To time</dt>
             <dd><input type="time" name="endTime" value="${param.endTime}"></dd>
         </dl>
+        <button type="submit">Filter meals</button>
     </form>
     <a href="meals?action=create">Add Meal</a>
     <br><br>
