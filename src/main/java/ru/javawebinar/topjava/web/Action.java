@@ -6,6 +6,7 @@ public enum Action {
     CREATE("create"),
     UPDATE("update"),
     DELETE("delete"),
+    FILTER("filter"),
     ALL("all");
 
     private final String action;

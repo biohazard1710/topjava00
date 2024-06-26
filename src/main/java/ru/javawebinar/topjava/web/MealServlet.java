@@ -5,10 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.repository.MealRepository;
-import ru.javawebinar.topjava.repository.inmemory.InMemoryMealRepository;
 import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 
 import javax.servlet.ServletException;
@@ -16,10 +13,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
+
+import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalDate;
+import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
 
 public class MealServlet extends HttpServlet {
     private static final String CONFIG_LOCATION = "spring/spring-app.xml";
@@ -33,6 +35,10 @@ public class MealServlet extends HttpServlet {
     private static final String MEALS = "meals";
     private static final String MEAL_FORM_JSP = "/mealForm.jsp";
     private static final String MEALS_JSP = "/meals.jsp";
+    private static final String PARAMETER_START_DATE = "startDate";
+    private static final String PARAMETER_END_DATE = "endDate";
+    private static final String PARAMETER_START_TIME = "startTime";
+    private static final String PARAMETER_END_TIME = "endTime";
 
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
 
@@ -89,6 +95,14 @@ public class MealServlet extends HttpServlet {
                         mealRestController.get(getId(request));
                 request.setAttribute(MEAL, meal);
                 request.getRequestDispatcher(MEAL_FORM_JSP).forward(request, response);
+                break;
+            case FILTER:
+                LocalDate startDate = parseLocalDate(request.getParameter(PARAMETER_START_DATE));
+                LocalDate endDate = parseLocalDate(request.getParameter(PARAMETER_END_DATE));
+                LocalTime startTime = parseLocalTime(request.getParameter(PARAMETER_START_TIME));
+                LocalTime endTime = parseLocalTime(request.getParameter(PARAMETER_END_TIME));
+                request.setAttribute(MEALS, mealRestController.getBetween(startDate, startTime, endDate, endTime));
+                request.getRequestDispatcher(MEALS_JSP).forward(request, response);
                 break;
             case ALL:
             default:

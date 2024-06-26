@@ -24,6 +24,22 @@ public class DateTimeUtil {
         return localDate != null ? localDate.plus(1, ChronoUnit.DAYS).atStartOfDay() : MAX_DATE;
     }
 
+    public static LocalDate parseLocalDate(String str) {
+        if (str == null) {
+            return null;
+        } else {
+            return LocalDate.parse(str);
+        }
+    }
+
+    public static LocalTime parseLocalTime(String str) {
+        if (str == null) {
+            return null;
+        } else {
+            return LocalTime.parse(str);
+        }
+    }
+
     public static String toString(LocalDateTime ldt) {
         return ldt == null ? "" : ldt.format(DATE_TIME_FORMATTER);
     }
