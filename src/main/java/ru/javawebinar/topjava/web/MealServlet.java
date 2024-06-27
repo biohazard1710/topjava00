@@ -31,8 +31,9 @@ public class MealServlet extends HttpServlet {
     private static final String PARAMETER_DESCRIPTION = "description";
     private static final String PARAMETER_CALORIES = "calories";
     private static final String PARAMETER_ACTION = "action";
-    private static final String REQUEST_MEAL = "meal";
-    private static final String REQUEST_MEALS = "meals";
+    private static final String ATTRIBUTE_MEAL = "meal";
+    private static final String REDIRECT_MEALS = "meals";
+    private static final String ATTRIBUTE_MEALS = "meals";
     private static final String VIEW_MEAL_FORM_JSP = "/mealForm.jsp";
     private static final String VIEW_MEALS_JSP = "/meals.jsp";
     private static final String PARAMETER_START_DATE = "startDate";
@@ -62,14 +63,14 @@ public class MealServlet extends HttpServlet {
         request.setCharacterEncoding(CHARACTER_ENCODING);
 
         Meal meal = createMealFromRequest(request);
-        
+
         log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
         if (meal.isNew()) {
             mealRestController.create(meal);
         } else {
             mealRestController.update(meal, meal.getId());
         }
-        response.sendRedirect(VIEW_MEALS_JSP);
+        response.sendRedirect(REDIRECT_MEALS);
     }
 
     @Override
@@ -82,29 +83,30 @@ public class MealServlet extends HttpServlet {
                 int id = getId(request);
                 log.info("Delete id={}", id);
                 mealRestController.delete(id);
-                response.sendRedirect(VIEW_MEALS_JSP);
+                response.sendRedirect(REDIRECT_MEALS);
                 break;
             case CREATE:
             case UPDATE:
                 final Meal meal = Action.CREATE.equals(action) ?
-                        new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000) :
+                        new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "Введите описание еды", 1000) :
                         mealRestController.get(getId(request));
-                request.setAttribute(REQUEST_MEAL, meal);
+                request.setAttribute(ATTRIBUTE_MEAL, meal);
                 request.getRequestDispatcher(VIEW_MEAL_FORM_JSP).forward(request, response);
                 break;
             case FILTER:
-                LocalDate startDate = parseLocalDate(request.getParameter(PARAMETER_START_DATE));
-                LocalDate endDate = parseLocalDate(request.getParameter(PARAMETER_END_DATE));
-                LocalTime startTime = parseLocalTime(request.getParameter(PARAMETER_START_TIME));
-                LocalTime endTime = parseLocalTime(request.getParameter(PARAMETER_END_TIME));
-                request.setAttribute(REQUEST_MEALS, mealRestController.getBetween(startDate, startTime, endDate, endTime));
+
+                    LocalDate startDate = parseLocalDate(request.getParameter(PARAMETER_START_DATE));
+                    LocalDate endDate = parseLocalDate(request.getParameter(PARAMETER_END_DATE));
+                    LocalTime startTime = parseLocalTime(request.getParameter(PARAMETER_START_TIME));
+                    LocalTime endTime = parseLocalTime(request.getParameter(PARAMETER_END_TIME));
+                request.setAttribute(ATTRIBUTE_MEALS, mealRestController.getBetween(startDate, startTime, endDate, endTime));
                 request.getRequestDispatcher(VIEW_MEALS_JSP).forward(request, response);
                 break;
             case ALL:
             default:
                 log.info("getAll");
                 List<MealTo> meals = mealRestController.getAll();
-                request.setAttribute(REQUEST_MEALS, meals);
+                request.setAttribute(ATTRIBUTE_MEALS, meals);
                 request.getRequestDispatcher(VIEW_MEALS_JSP).forward(request, response);
                 break;
         }

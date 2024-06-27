@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 public class DateTimeUtil {
@@ -25,7 +26,7 @@ public class DateTimeUtil {
     }
 
     public static LocalDate parseLocalDate(String str) {
-        if (str == null) {
+        if (str == null || str.isEmpty()) {
             return null;
         } else {
             return LocalDate.parse(str);
@@ -33,7 +34,7 @@ public class DateTimeUtil {
     }
 
     public static LocalTime parseLocalTime(String str) {
-        if (str == null) {
+        if (str == null || str.isEmpty()) {
             return null;
         } else {
             return LocalTime.parse(str);
@@ -44,4 +45,3 @@ public class DateTimeUtil {
         return ldt == null ? "" : ldt.format(DATE_TIME_FORMATTER);
     }
 }
-
