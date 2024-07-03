@@ -1,7 +1,10 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AfterClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -9,11 +12,15 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
+import ru.javawebinar.topjava.MatcherFactory;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -29,8 +36,17 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Ignore
 public class MealServiceTest {
 
+    private static final Logger logger = LoggerFactory.getLogger(MealServiceTest.class);
+
     @Autowired
     private MealService service;
+
+    private static TimingTestWatcher timingTestWatcher = new TimingTestWatcher();
+
+    @Rule
+    public RuleChain chain = RuleChain.outerRule(timingTestWatcher);
+
+    private static final MatcherFactory.Matcher<Meal> MEAL_MATCHER = MatcherFactory.usingIgnoringFieldsComparator("user");
 
     @Test
     public void delete() {
@@ -109,5 +125,14 @@ public class MealServiceTest {
     @Test
     public void getBetweenWithNullDates() {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, USER_ID), meals);
+    }
+
+    @AfterClass
+    public static void printSummary() {
+        logger.info("Test summary: ");
+        List<TimingTestWatcher.TestResult> resultList = TimingTestWatcher.getResults();
+        for (TimingTestWatcher.TestResult result : resultList) {
+            logger.info("{} - took {} ms", result.getResultTestName(), result.getResultDuration());
+        }
     }
 }
