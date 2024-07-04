@@ -1,8 +1,13 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AfterClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.ContextConfiguration;
@@ -14,6 +19,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -26,11 +32,17 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
-@Ignore
 public class MealServiceTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(MealServiceTest.class);
 
     @Autowired
     private MealService service;
+
+    private static TimingTestWatcher timingTestWatcher = new TimingTestWatcher();
+
+    @Rule
+    public RuleChain chain = RuleChain.outerRule(timingTestWatcher);
 
     @Test
     public void delete() {
@@ -109,5 +121,14 @@ public class MealServiceTest {
     @Test
     public void getBetweenWithNullDates() {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, USER_ID), meals);
+    }
+
+    @AfterClass
+    public static void printSummary() {
+        logger.info("Test summary: ");
+        List<TimingTestWatcher.TestResult> resultList = TimingTestWatcher.getResults();
+        for (TimingTestWatcher.TestResult result : resultList) {
+            logger.info("{} - took {} ms", result.getTestName(), result.getDuration());
+        }
     }
 }
