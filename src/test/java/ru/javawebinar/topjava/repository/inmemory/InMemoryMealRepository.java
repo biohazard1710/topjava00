@@ -32,10 +32,29 @@ public class InMemoryMealRepository implements MealRepository {
 
 
     @Override
-    public Meal save(Meal meal, int userId) {
+    public Meal create(Meal meal, int userId) {
         Objects.requireNonNull(meal, "meal must not be null");
         InMemoryBaseRepository<Meal> meals = usersMealsMap.computeIfAbsent(userId, uId -> new InMemoryBaseRepository<>());
-        return meals.save(meal);
+
+        if (meal.isNew()) {
+            return meals.save(meal);
+        } else {
+            log.error("Attempted to create an existing meal: {}", meal);
+            throw new IllegalArgumentException("Meal must be new (id=null)");
+        }
+    }
+
+    @Override
+    public Meal update(Meal meal, int userId) {
+        Objects.requireNonNull(meal, "meal must not be null");
+        InMemoryBaseRepository<Meal> meals = usersMealsMap.computeIfAbsent(userId, uId -> new InMemoryBaseRepository<>());
+
+        if (!meal.isNew()) {
+            return meals.save(meal);
+        } else {
+            log.error("Attempted to update a non-existing meal: {}", meal);
+            throw new IllegalArgumentException("Meal must exist (id != null)");
+        }
     }
 
     @PostConstruct

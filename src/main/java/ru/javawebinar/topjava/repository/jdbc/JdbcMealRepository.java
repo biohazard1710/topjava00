@@ -18,6 +18,12 @@ import java.util.List;
 @Repository
 public class JdbcMealRepository implements MealRepository {
 
+    private static final String PARAMETER_ID = "id";
+    private static final String PARAMETER_DESCRIPTION = "description";
+    private static final String PARAMETER_CALORIES = "calories";
+    private static final String PARAMETER_DATE_TIME = "date_time";
+    private static final String PARAMETER_USER_ID = "user_id";
+
     private static final RowMapper<Meal> ROW_MAPPER = BeanPropertyRowMapper.newInstance(Meal.class);
 
     private final JdbcTemplate jdbcTemplate;
@@ -37,24 +43,31 @@ public class JdbcMealRepository implements MealRepository {
     }
 
     @Override
-    public Meal save(Meal meal, int userId) {
+    public Meal create(Meal meal, int userId) {
         MapSqlParameterSource map = new MapSqlParameterSource()
-                .addValue("id", meal.getId())
-                .addValue("description", meal.getDescription())
-                .addValue("calories", meal.getCalories())
-                .addValue("date_time", meal.getDateTime())
-                .addValue("user_id", userId);
+                .addValue(PARAMETER_DESCRIPTION, meal.getDescription())
+                .addValue(PARAMETER_CALORIES, meal.getCalories())
+                .addValue(PARAMETER_DATE_TIME, meal.getDateTime())
+                .addValue(PARAMETER_USER_ID, userId);
 
-        if (meal.isNew()) {
             Number newId = insertMeal.executeAndReturnKey(map);
             meal.setId(newId.intValue());
-        } else {
-            if (namedParameterJdbcTemplate.update("" +
-                    "UPDATE meal " +
-                    "   SET description=:description, calories=:calories, date_time=:date_time " +
-                    " WHERE id=:id AND user_id=:user_id", map) == 0) {
-                return null;
-            }
+            return meal;
+    }
+
+    @Override
+    public Meal update(Meal meal, int userId) {
+        MapSqlParameterSource map = new MapSqlParameterSource()
+                .addValue(PARAMETER_ID, meal.getId())
+                .addValue(PARAMETER_DESCRIPTION, meal.getDescription())
+                .addValue(PARAMETER_CALORIES, meal.getCalories())
+                .addValue(PARAMETER_DATE_TIME, meal.getDateTime())
+                .addValue(PARAMETER_USER_ID, userId);
+
+        if (namedParameterJdbcTemplate.update(
+                "UPDATE meal SET description=:description, calories=:calories, date_time=:date_time" +
+                        " WHERE id=:id AND user_id=:user_id", map) == 0) {
+            return null;
         }
         return meal;
     }
