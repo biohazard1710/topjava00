@@ -40,11 +40,19 @@ public class MealService {
 
     public void update(Meal meal, int userId) {
         Assert.notNull(meal, "meal must not be null");
-        checkNotFoundWithId(repository.save(meal, userId), meal.id());
+        checkMealBelongsToUser(meal.id(), userId);
+        checkNotFoundWithId(repository.update(meal, userId), meal.id());
     }
 
     public Meal create(Meal meal, int userId) {
         Assert.notNull(meal, "meal must not be null");
-        return repository.save(meal, userId);
+        return repository.create(meal, userId);
+    }
+
+    private void checkMealBelongsToUser(int mealId, int userId) {
+        Meal meal = repository.get(mealId, userId);
+        if (meal != null && meal.getUser().getId() != userId) {
+            throw new IllegalArgumentException("Meal with id " + mealId + " doesn't belong to user with id " + userId);
+        }
     }
 }
