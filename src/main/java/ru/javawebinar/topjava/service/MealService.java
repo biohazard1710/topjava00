@@ -4,7 +4,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
+import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -40,8 +42,11 @@ public class MealService {
 
     public void update(Meal meal, int userId) {
         Assert.notNull(meal, "meal must not be null");
-        checkMealBelongsToUser(meal.id(), userId);
-        checkNotFoundWithId(repository.update(meal, userId), meal.id());
+        Integer mealId = getMealId(meal);
+        Meal mealFromDb = getMeal(userId, mealId);
+        User user = mealFromDb.getUser();
+        meal.setUser(user);
+        repository.update(meal, userId);
     }
 
     public Meal create(Meal meal, int userId) {
@@ -49,10 +54,17 @@ public class MealService {
         return repository.create(meal, userId);
     }
 
-    private void checkMealBelongsToUser(int mealId, int userId) {
-        Meal meal = repository.get(mealId, userId);
-        if (meal != null && meal.getUser().getId() != userId) {
-            throw new IllegalArgumentException("Meal with id " + mealId + " doesn't belong to user with id " + userId);
+    private Meal getMeal(int userId, Integer mealId) {
+        Meal mealFromDb = repository.get(mealId, userId);
+        if (mealFromDb == null) {
+            throw new NotFoundException("meal with id " + mealId + " not found for user with id " + userId);
         }
+        return mealFromDb;
+    }
+
+    private Integer getMealId(Meal meal) {
+        Integer mealId = meal.getId();
+        Assert.notNull(mealId, "meal id must not be null");
+        return mealId;
     }
 }

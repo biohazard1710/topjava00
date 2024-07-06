@@ -35,9 +35,7 @@ public class JpaMealRepository implements MealRepository {
     @Override
     @Transactional
     public Meal update(Meal meal, int userId) {
-        User ref = em.getReference(User.class, userId);
-        meal.setUser(ref);
-        return get(meal.id(), userId) == null ? null : em.merge(meal);
+        return em.merge(meal);
     }
 
     @Override
