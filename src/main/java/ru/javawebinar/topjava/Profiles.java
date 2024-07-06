@@ -5,8 +5,11 @@ import org.springframework.util.ClassUtils;
 public class Profiles {
     public static final String
             JDBC = "jdbc",
+            JPA = "jpa",
+            DATAJPA = "datajpa";
 
-    POSTGRES_DB = "postgres",
+    public static final String
+            POSTGRES_DB = "postgres",
             HSQL_DB = "hsqldb";
 
     public static final String ACTIVE_DB = POSTGRES_DB;
