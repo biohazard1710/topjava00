@@ -1,17 +1,11 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.dao.DataAccessException;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlConfig;
-import org.springframework.test.context.junit4.SpringRunner;
-import ru.javawebinar.topjava.ActiveDbProfileResolver;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
@@ -22,18 +16,11 @@ import java.util.List;
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.UserTestData.*;
 
-@ContextConfiguration({
-        "classpath:spring/spring-app.xml",
-        "classpath:spring/spring-db.xml"
-})
-@RunWith(SpringRunner.class)
-@Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
-@ActiveProfiles(resolver = ActiveDbProfileResolver.class)
-public class UserServiceTest {
+@Ignore
+public abstract class UserServiceTest extends BaseServiceTest {
 
-    @Autowired
-    private UserService service;
-
+    protected abstract UserService getService();
+    
     @Autowired
     private CacheManager cacheManager;
 
@@ -44,58 +31,58 @@ public class UserServiceTest {
 
     @Test
     public void create() {
-        User created = service.create(getNew());
+        User created = getService().create(getNew());
         int newId = created.id();
         User newUser = getNew();
         newUser.setId(newId);
         USER_MATCHER.assertMatch(created, newUser);
-        USER_MATCHER.assertMatch(service.get(newId), newUser);
+        USER_MATCHER.assertMatch(getService().get(newId), newUser);
     }
 
     @Test
     public void duplicateMailCreate() {
         assertThrows(DataAccessException.class, () ->
-                service.create(new User(null, "Duplicate", "user@yandex.ru", "newPass", Role.USER)));
+                getService().create(new User(null, "Duplicate", "user@yandex.ru", "newPass", Role.USER)));
     }
 
     @Test
     public void delete() {
-        service.delete(USER_ID);
-        assertThrows(NotFoundException.class, () -> service.get(USER_ID));
+        getService().delete(USER_ID);
+        assertThrows(NotFoundException.class, () -> getService().get(USER_ID));
     }
 
     @Test
     public void deletedNotFound() {
-        assertThrows(NotFoundException.class, () -> service.delete(NOT_FOUND));
+        assertThrows(NotFoundException.class, () -> getService().delete(NOT_FOUND));
     }
 
     @Test
     public void get() {
-        User user = service.get(USER_ID);
+        User user = getService().get(USER_ID);
         USER_MATCHER.assertMatch(user, UserTestData.user);
     }
 
     @Test
     public void getNotFound() {
-        assertThrows(NotFoundException.class, () -> service.get(NOT_FOUND));
+        assertThrows(NotFoundException.class, () -> getService().get(NOT_FOUND));
     }
 
     @Test
     public void getByEmail() {
-        User user = service.getByEmail("admin@gmail.com");
+        User user = getService().getByEmail("admin@gmail.com");
         USER_MATCHER.assertMatch(user, admin);
     }
 
     @Test
     public void update() {
         User updated = getUpdated();
-        service.update(updated);
-        USER_MATCHER.assertMatch(service.get(USER_ID), getUpdated());
+        getService().update(updated);
+        USER_MATCHER.assertMatch(getService().get(USER_ID), getUpdated());
     }
 
     @Test
     public void getAll() {
-        List<User> all = service.getAll();
+        List<User> all = getService().getAll();
         USER_MATCHER.assertMatch(all, admin, guest, user);
     }
 }
