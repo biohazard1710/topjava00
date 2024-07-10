@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 
-import javax.persistence.NamedQuery;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
