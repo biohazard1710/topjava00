@@ -2,6 +2,7 @@ package ru.javawebinar.topjava;
 
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.env.AbstractEnvironment;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.MealTo;
@@ -15,7 +16,16 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SpringMain {
+
+    private static final String ACTIVE_PROFILES_HSQLDB_DATAJPA = "hsqldb, datajpa";
+    private static final String ACTIVE_PROFILES_HSQLDB_JPA = "hsqldb, jpa";
+    private static final String ACTIVE_PROFILES_HSQLDB_JDBC = "hsqldb, jdbc";
+    private static final String ACTIVE_PROFILES_POSTGRES_DATAJPA = "postgres, datajpa";
+    private static final String ACTIVE_PROFILES_POSTGRES_JPA = "postgres, jpa";
+    private static final String ACTIVE_PROFILES_POSTGRES_JDBC = "postgres, jdbc";
+
     public static void main(String[] args) {
+        System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, ACTIVE_PROFILES_HSQLDB_DATAJPA);
         // java 7 automatic resource management (ARM)
         try (ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml", "spring/inmemory.xml")) {
             System.out.println("Bean definition names: " + Arrays.toString(appCtx.getBeanDefinitionNames()));

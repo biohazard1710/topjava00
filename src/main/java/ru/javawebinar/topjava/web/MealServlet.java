@@ -2,6 +2,7 @@ package ru.javawebinar.topjava.web;
 
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.util.StringUtils;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.web.meal.MealRestController;
@@ -21,12 +22,19 @@ import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalDate;
 import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
 
 public class MealServlet extends HttpServlet {
+    private static final String ACTIVE_PROFILES_HSQLDB_DATAJPA = "hsqldb, datajpa";
+    private static final String ACTIVE_PROFILES_HSQLDB_JPA = "hsqldb, jpa";
+    private static final String ACTIVE_PROFILES_HSQLDB_JDBC = "hsqldb, jdbc";
+    private static final String ACTIVE_PROFILES_POSTGRES_DATAJPA = "postgres, datajpa";
+    private static final String ACTIVE_PROFILES_POSTGRES_JPA = "postgres, jpa";
+    private static final String ACTIVE_PROFILES_POSTGRES_JDBC = "postgres, jdbc";
 
     private ConfigurableApplicationContext springContext;
     private MealRestController mealController;
 
     @Override
     public void init() {
+        System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, ACTIVE_PROFILES_HSQLDB_DATAJPA);
         springContext = new ClassPathXmlApplicationContext("spring/spring-app.xml", "spring/spring-db.xml");
         mealController = springContext.getBean(MealRestController.class);
     }
