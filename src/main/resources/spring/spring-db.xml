@@ -66,6 +66,10 @@
         <bean id="namedJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
             <constructor-arg ref="jdbcTemplate"/>
         </bean>
+
+        <bean id="transactionalManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+            <constructor-arg ref="dataSource"/>
+        </bean>
     </beans>
 
     <beans profile="jpa,datajpa">
@@ -118,4 +122,5 @@
         <context:component-scan base-package="ru.javawebinar.**.repository.datajpa"/>
         <jpa:repositories base-package="ru.javawebinar.**.repository.datajpa"/>
     </beans>
+
 </beans>
