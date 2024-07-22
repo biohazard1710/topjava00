@@ -12,6 +12,7 @@ import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
+import javax.validation.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -20,6 +21,9 @@ import java.util.stream.Collectors;
 @Repository
 @Transactional(readOnly = true)
 public class JdbcUserRepository implements UserRepository {
+
+    private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    private static final Validator validator = factory.getValidator();
 
     private static final String GET_ID = "id";
     private static final String GET_NAME = "name";
@@ -49,6 +53,7 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     @Transactional
     public User save(User user) {
+        validate(user);
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
 
         if (user.isNew()) {
@@ -163,6 +168,13 @@ public class JdbcUserRepository implements UserRepository {
         user.setCaloriesPerDay(rs.getInt(GET_CALORIES_PER_DAY));
         user.setRoles(new HashSet<>());
         return user;
+    }
+
+    private <T> void validate(T object ) {
+        Set<ConstraintViolation<T>> violations = validator.validate(object);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
     }
 
 }

@@ -24,11 +24,6 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
     @Autowired
     protected MealService service;
 
-    @Before
-    public void setup() {
-        Assume.assumeTrue(!isJdbcProfile());
-    }
-
     @Test
     public void delete() {
         service.delete(MEAL1_ID, USER_ID);
