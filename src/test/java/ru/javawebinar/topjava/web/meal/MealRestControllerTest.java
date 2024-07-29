@@ -12,10 +12,10 @@ import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
-import ru.javawebinar.topjava.web.SecurityUtil;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,9 +28,11 @@ import static ru.javawebinar.topjava.UserTestData.*;
 class MealRestControllerTest extends AbstractControllerTest {
 
     private static final String REST_URL = MealRestController.REST_URL + "/";
-    private static final String PARAM_START_DATE_TIME = "startDateTime";
-    private static final String PARAM_END_DATE_TIME = "endDateTime";
-    private static final String PERFORM_BETWEEN = "between";
+    private static final String PARAM_START_DATE = "startDate";
+    private static final String PARAM_START_TIME = "startTime";
+    private static final String PARAM_END_DATE = "endDate";
+    private static final String PARAM_END_TIME = "endTime";
+    private static final String PERFORM_FILTER = "filter";
 
     @Autowired
     private MealService mealService;
@@ -88,14 +90,17 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getBetween() throws Exception {
-        LocalDateTime startDateTime = LocalDateTime.of(2020, 1, 30, 0, 0);
-        LocalDateTime endDateTime = LocalDateTime.of(2020, 1, 31, 23, 59);
-        List<MealTo> expected = MealsUtil.getFilteredTos(meals, user.getCaloriesPerDay(),
-                                                startDateTime.toLocalTime(), endDateTime.toLocalTime());
+        LocalDate startDate = LocalDate.of(2020, 1, 30);
+        LocalTime startTime = LocalTime.of(0, 0);
+        LocalDate endDate = LocalDate.of(2020, 1, 31);
+        LocalTime endTime = LocalTime.of(23, 59);
+        List<MealTo> expected = MealsUtil.getFilteredTos(meals, user.getCaloriesPerDay(), startTime, endTime);
 
-        perform(MockMvcRequestBuilders.get(REST_URL + PERFORM_BETWEEN)
-                .param(PARAM_START_DATE_TIME, startDateTime.toString())
-                .param(PARAM_END_DATE_TIME, endDateTime.toString()))
+        perform(MockMvcRequestBuilders.get(REST_URL + PERFORM_FILTER)
+                .param(PARAM_START_DATE, startDate.toString())
+                .param(PARAM_START_TIME, startTime.toString())
+                .param(PARAM_END_DATE, endDate.toString())
+                .param(PARAM_END_TIME, endTime.toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(MEAL_TO_MATCHER.contentJson(expected));

@@ -10,7 +10,9 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -19,7 +21,7 @@ public class MealRestController extends AbstractMealController {
 
     static final String REST_URL = "/rest/meals";
     private static final String MAPPING_ID = "/{id}";
-    private static final String MAPPING_BETWEEN = "/between";
+    private static final String MAPPING_FILTER = "/filter";
 
     @Override
     @GetMapping(MAPPING_ID)
@@ -48,10 +50,11 @@ public class MealRestController extends AbstractMealController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@RequestBody Meal meal,@PathVariable int id) { super.update(meal, id); }
 
-    @GetMapping(MAPPING_BETWEEN)
-    public List<MealTo> getBetween(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
-                                   @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime) {
-        return super.getBetween(startDateTime.toLocalDate(), startDateTime.toLocalTime(),
-                                endDateTime.toLocalDate(), endDateTime.toLocalTime());
+    @GetMapping(MAPPING_FILTER)
+    public List<MealTo> getBetween(@RequestParam(required = false) LocalDate startDate,
+                                   @RequestParam(required = false) LocalTime startTime,
+                                   @RequestParam(required = false) LocalDate endDate,
+                                   @RequestParam(required = false) LocalTime endTime) {
+        return super.getBetween(startDate, startTime, endDate, endTime);
     }
 }
