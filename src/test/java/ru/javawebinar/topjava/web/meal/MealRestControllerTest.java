@@ -94,7 +94,6 @@ class MealRestControllerTest extends AbstractControllerTest {
         LocalTime startTime = LocalTime.of(0, 0);
         LocalDate endDate = LocalDate.of(2020, 1, 31);
         LocalTime endTime = LocalTime.of(23, 59);
-        List<MealTo> expected = MealsUtil.getFilteredTos(meals, user.getCaloriesPerDay(), startTime, endTime);
 
         perform(MockMvcRequestBuilders.get(REST_URL + PERFORM_FILTER)
                 .param(PARAM_START_DATE, startDate.toString())
@@ -103,6 +102,11 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .param(PARAM_END_TIME, endTime.toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MEAL_TO_MATCHER.contentJson(expected));
+                .andExpect(MEAL_TO_MATCHER.contentJson(getFilteredTos(startDate, startTime, endDate, endTime)));
+    }
+
+    private List<MealTo> getFilteredTos(LocalDate startDate, LocalTime startTime, LocalDate endDate, LocalTime endTime) {
+        return MealsUtil.getFilteredTos(mealService.getBetweenInclusive(startDate, endDate, USER_ID), user.getCaloriesPerDay(),
+                startTime, endTime);
     }
 }
