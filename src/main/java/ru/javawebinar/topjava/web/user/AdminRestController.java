@@ -15,6 +15,9 @@ import java.util.List;
 public class AdminRestController extends AbstractUserController {
 
     static final String REST_URL = "/rest/admin/users";
+    private static final String MAPPING_ID = "/{id}";
+    private static final String MAPPING_BY_EMAIL = "/by-email";
+    private static final String MAPPING_WITH_MEALS = "/{id}/with-meals";
 
     @Override
     @GetMapping
@@ -23,7 +26,7 @@ public class AdminRestController extends AbstractUserController {
     }
 
     @Override
-    @GetMapping("/{id}")
+    @GetMapping(MAPPING_ID)
     public User get(@PathVariable int id) {
         return super.get(id);
     }
@@ -32,28 +35,35 @@ public class AdminRestController extends AbstractUserController {
     public ResponseEntity<User> createWithLocation(@RequestBody User user) {
         User created = super.create(user);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(REST_URL + "/{id}")
+                .path(REST_URL + MAPPING_ID)
                 .buildAndExpand(created.getId()).toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
 
     @Override
-    @DeleteMapping("/{id}")
+    @DeleteMapping(MAPPING_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable int id) {
         super.delete(id);
     }
 
     @Override
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = MAPPING_ID, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@RequestBody User user, @PathVariable int id) {
         super.update(user, id);
     }
 
     @Override
-    @GetMapping("/by-email")
+    @GetMapping(MAPPING_BY_EMAIL)
     public User getByMail(@RequestParam String email) {
         return super.getByMail(email);
     }
+
+    @Override
+    @GetMapping(MAPPING_WITH_MEALS)
+    public User getWithMeal(@PathVariable int id) {
+        return super.getWithMeal(id);
+    }
+
 }

@@ -10,7 +10,10 @@ import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 @RestController
 @RequestMapping(value = ProfileRestController.REST_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProfileRestController extends AbstractUserController {
+
     static final String REST_URL = "/rest/profile";
+    private static final String MAPPING_TEXT = "/text";
+    private static final String MAPPING_WITH_MEALS = "/with-meals";
 
     @GetMapping
     public User get() {
@@ -29,8 +32,14 @@ public class ProfileRestController extends AbstractUserController {
         super.update(user, authUserId());
     }
 
-    @GetMapping("/text")
+    @GetMapping(MAPPING_TEXT)
     public String testUTF() {
         return "Русский текст";
     }
+
+    @GetMapping(MAPPING_WITH_MEALS)
+    public User getWithMeals() {
+        return super.getWithMeal(authUserId());
+    }
+
 }
