@@ -13,7 +13,7 @@ public class ProfileRestController extends AbstractUserController {
 
     static final String REST_URL = "/rest/profile";
     private static final String MAPPING_TEXT = "/text";
-    private static final String MAPPING_WITH_MEALS = "/with-meals";
+    static final String MAPPING_WITH_MEALS = "/with-meals";
 
     @GetMapping
     public User get() {

@@ -20,6 +20,8 @@ import static ru.javawebinar.topjava.UserTestData.*;
 class AdminRestControllerTest extends AbstractControllerTest {
 
     private static final String REST_URL = AdminRestController.REST_URL + '/';
+    private static final String URL_BY_EMAIL = "by-email?email=";
+    private static final String URL_WITH_MEALS = "/with-meals";
 
     @Autowired
     private UserService userService;
@@ -36,7 +38,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getByEmail() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL + "by-email?email=" + user.getEmail()))
+        perform(MockMvcRequestBuilders.get(REST_URL + URL_BY_EMAIL + user.getEmail()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(USER_MATCHER.contentJson(user));
@@ -83,4 +85,13 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(USER_MATCHER.contentJson(admin, guest, user));
     }
+
+    @Test
+    void getWithMeals() throws Exception {
+        perform(MockMvcRequestBuilders.get(REST_URL + ADMIN_ID + URL_WITH_MEALS))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(USER_MATCHER.contentJson(admin));
+    }
+
 }

@@ -18,6 +18,7 @@ public class AdminRestController extends AbstractUserController {
     private static final String MAPPING_ID = "/{id}";
     private static final String MAPPING_BY_EMAIL = "/by-email";
     private static final String MAPPING_WITH_MEALS = "/{id}/with-meals";
+    private static final String URL_ID = "/{id}";
 
     @Override
     @GetMapping
@@ -35,7 +36,7 @@ public class AdminRestController extends AbstractUserController {
     public ResponseEntity<User> createWithLocation(@RequestBody User user) {
         User created = super.create(user);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(REST_URL + MAPPING_ID)
+                .path(REST_URL + URL_ID)
                 .buildAndExpand(created.getId()).toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
