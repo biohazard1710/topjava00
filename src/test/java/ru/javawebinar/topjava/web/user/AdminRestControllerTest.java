@@ -1,10 +1,12 @@
 package ru.javawebinar.topjava.web.user;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
@@ -16,10 +18,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.javawebinar.topjava.UserTestData.*;
+import static ru.javawebinar.topjava.MealTestData.*;
 
 class AdminRestControllerTest extends AbstractControllerTest {
 
     private static final String REST_URL = AdminRestController.REST_URL + '/';
+    private static final String URL_BY_EMAIL = "by-email?email=";
+    private static final String URL_WITH_MEALS = "/with-meals";
 
     @Autowired
     private UserService userService;
@@ -36,7 +41,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getByEmail() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL + "by-email?email=" + user.getEmail()))
+        perform(MockMvcRequestBuilders.get(REST_URL + URL_BY_EMAIL + user.getEmail()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(USER_MATCHER.contentJson(user));
@@ -52,7 +57,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     void update() throws Exception {
-        User updated = getUpdated();
+        User updated = UserTestData.getUpdated();
         perform(MockMvcRequestBuilders.put(REST_URL + USER_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(updated)))
@@ -63,7 +68,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
     @Test
     void createWithLocation() throws Exception {
-        User newUser = getNew();
+        User newUser = UserTestData.getNew();
         ResultActions action = perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(newUser)))
@@ -83,4 +88,20 @@ class AdminRestControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(USER_MATCHER.contentJson(admin, guest, user));
     }
-}
+
+    @Test
+    void getWithMeals() throws Exception {
+            Assumptions.assumeTrue(isDataJpaProfile(),"Skipping test getWithMeals because in not datajpa profile");
+
+            ResultActions action = perform(MockMvcRequestBuilders.get(REST_URL + USER_ID + URL_WITH_MEALS))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                    .andDo(print());
+
+            User actualUser = USER_MATCHER.readFromJson(action);
+            USER_MATCHER.assertMatch(actualUser, user);
+            MEAL_MATCHER.assertMatch(actualUser.getMeals(), meals);
+        }
+
+    }
+
