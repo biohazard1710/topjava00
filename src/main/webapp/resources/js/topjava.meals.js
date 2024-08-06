@@ -52,6 +52,19 @@ function filter() {
     });
 }
 
+function resetFilter() {
+    $('#filterForm')[0].reset();
+    $.ajax({
+        type: "GET",
+        url: mealAjaxUrl
+    }).done(function (data) {
+        updateTableByData(data);
+        successNoty("Filter reset");
+    }).fail(function (jqXHR) {
+        failNoty(jqXHR);
+    });
+}
+
 function updateTableByData(data) {
     ctx.datatableApi.clear().rows.add(data).draw();
 }

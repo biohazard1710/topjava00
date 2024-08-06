@@ -18,25 +18,31 @@
                 <form id="filterForm">
                     <dl>
                         <dt><spring:message code="meal.startDate"/>:</dt>
-                        <dd><input type="date" name="startDate" id="startDate" value="${param.startDate}"></dd>
+                        <dd><input type="date" id="startDate" name="startDate" value="${param.startDate}"></dd>
                     </dl>
                     <dl>
                         <dt><spring:message code="meal.endDate"/>:</dt>
-                        <dd><input type="date" name="endDate" id="endDate" value="${param.endDate}"></dd>
+                        <dd><input type="date" id="endDate" name="endDate" value="${param.endDate}"></dd>
                     </dl>
                     <dl>
                         <dt><spring:message code="meal.startTime"/>:</dt>
-                        <dd><input type="time" name="startTime" id="startTime" value="${param.startTime}"></dd>
+                        <dd><input type="time" id="startTime" name="startTime" value="${param.startTime}"></dd>
                     </dl>
                     <dl>
                         <dt><spring:message code="meal.endTime"/>:</dt>
-                        <dd><input type="time" name="endTime" id="endTime" value="${param.endTime}"></dd>
+                        <dd><input type="time" id="endTime" name="endTime" value="${param.endTime}"></dd>
                     </dl>
+                </form>
+                <div class="card-footer text-right">
                     <button type="button" class="btn btn-primary" onclick="filter()">
                         <span class="fa fa-filter"></span>
                         <spring:message code="meal.filter"/>
                     </button>
-                </form>
+                    <button type="button" class="btn btn-secondary" onclick="resetFilter()">
+                        <span class="fa fa-undo"></span>
+                        <spring:message code="common.cancel"/>
+                    </button>
+                </div>
             </div>
         </div>
         <br/>
