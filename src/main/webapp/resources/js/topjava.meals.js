@@ -37,3 +37,21 @@ $(function () {
         })
     );
 });
+
+function filter() {
+    const formData = $('#filterForm').serialize();
+    $.ajax({
+        type: "GET",
+        url: mealAjaxUrl + "filter",
+        data: formData
+    }).done(function (data) {
+        updateTableByData(data);
+        successNoty("Meals filtered");
+    }).fail(function (jqXHR) {
+        failNoty(jqXHR);
+    });
+}
+
+function updateTableByData(data) {
+    ctx.datatableApi.clear().rows.add(data).draw();
+}
