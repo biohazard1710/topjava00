@@ -2,7 +2,10 @@ const userAjaxUrl = "admin/users/";
 
 // https://stackoverflow.com/a/5064235/548473
 const ctx = {
-    ajaxUrl: userAjaxUrl
+    ajaxUrl: userAjaxUrl,
+    updateTable: function () {
+        $.get(userAjaxUrl, updateTableByData)
+    }
 };
 
 // $(document).ready(function () {
@@ -44,4 +47,23 @@ $(function () {
             ]
         })
     );
+
+    $("input:checkbox").click(function () {
+        enable($(this).closest('tr').attr("id"), $(this));
+    });
 });
+
+function enable(id, checkbox) {
+    const enabled = checkbox.is(":checked");
+    $.ajax({
+        url: userAjaxUrl + id,
+        type: "POST",
+        data: "enabled=" + enabled
+    }).done(function (data) {
+        checkbox.closest("tr").attr("data-user-enabled", enabled);
+        updateTableByData(data)
+        successNoty(enabled ? "Record enabled" : "Record disabled");
+    }).fail(function () {
+        $(checkbox).prop("checked", !enabled);
+    })
+}

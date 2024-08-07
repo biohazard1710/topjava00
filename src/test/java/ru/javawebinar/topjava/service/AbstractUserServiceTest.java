@@ -85,4 +85,17 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "mail@yandex.ru", "password", 9, true, new Date(), Set.of())));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "mail@yandex.ru", "password", 10001, true, new Date(), Set.of())));
     }
+
+    @Test
+    void enable() throws Exception {
+        User newUser = new User(user);
+        newUser.setEnabled(true);
+        service.enable(USER_ID, true);
+        USER_MATCHER.assertMatch(service.get(USER_ID), newUser);
+
+        newUser.setEnabled(false);
+        service.enable(USER_ID, false);
+        USER_MATCHER.assertMatch(service.get(USER_ID), newUser);
+
+    }
 }
