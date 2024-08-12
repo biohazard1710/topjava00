@@ -2,7 +2,6 @@ package ru.javawebinar.topjava.to;
 
 import org.hibernate.validator.constraints.Range;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.lang.NonNull;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -14,14 +13,14 @@ import java.util.Objects;
 public class MealTo extends BaseTo {
 
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime dateTime;
 
     @NotBlank
     @Size(min = 2, max = 120, message = "length must be between 2 and 120 characters")
     private String description;
 
-    @NonNull
+    @NotNull
     @Range(min = 10, max = 5000)
     private int calories;
 
