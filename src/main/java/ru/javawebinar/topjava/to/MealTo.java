@@ -13,7 +13,7 @@ import java.util.Objects;
 public class MealTo extends BaseTo {
 
     @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime dateTime;
 
     @NotBlank
