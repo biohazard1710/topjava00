@@ -42,8 +42,7 @@ public class MealService {
 
     public void update(Meal meal, int userId) {
         Assert.notNull(meal, "meal must not be null");
-//        checkNotFoundWithId(repository.save(meal, userId), meal.id()); : check works only for JDBC, disabled
-        repository.save(meal, userId);
+        checkNotFoundWithId(repository.save(meal, userId), meal.id());
     }
 
     public void update(MealTo mealTo, int userId) {
