@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -39,7 +40,7 @@ public class MealUIController extends AbstractMealController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<String> createOrUpdate(MealTo mealTo, BindingResult result) {
+    public ResponseEntity<String> createOrUpdate(@Valid MealTo mealTo, BindingResult result) {
         if (result.hasErrors()) {
             String errorFieldsMsg = result.getFieldErrors().stream()
                     .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
