@@ -37,7 +37,8 @@ public class ExceptionInfoHandler {
     private MessageSource messageSource;
 
     private static Map<String, String> CONSTRAINS_I18N_MAP = Map.of(
-            "users_unique_email_idx", "error.user.duplicateEmail");
+            "users_unique_email_idx", "error.user.duplicateEmail",
+            "meal_unique_user_datetime_idx", "error.meal.duplicateDateTime");
 
     //  http://stackoverflow.com/a/22358422/548473
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
